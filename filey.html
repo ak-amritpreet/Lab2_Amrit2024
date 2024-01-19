@@ -60,15 +60,15 @@ label {
     <label for="healthInput">Health Issues:</label>
     <input type="number" id="healthInput">
 
-    <button onclick="showWeights()">Weight</button>
+    <button onclick="Show_Weights()">Weight</button>
     <label for="weightUnitImperial">Imperial</label>
     <input type="radio" id="weightUnitImperial" name="weightUnit" value="imperial" checked>
     <label for="weightUnitMetric">Metric</label>
     <input type="radio" id="weightUnitMetric" name="weightUnit" value="metric">
 
-    <button onclick="showIntelligenceFriendly()">Intelligence - Friendly</button>
-    <button onclick="showAverageIntelligence()">Average Intelligence</button>
-    <button onclick="showAverageIntelligenceChildFriendly()">Average Intelligence for Child Friendly</button>
+    <button onclick="Show_IntelligenceFriendly()">Intelligence - Friendly</button>
+    <button onclick="Show_AverageIntelligence()">Average Intelligence</button>
+    <button onclick="Show_AverageIntelligenc_eChildFriendly()">Average Intelligence for Child Friendly</button>
 
     <div id="result"></div>
 
@@ -95,7 +95,7 @@ label {
             }
         }
 
-        async function showCatsByHealth() {
+        async function Show_CatsByHealth() {
             try {
                 const healthIssue = document.getElementById('healthInput').value;
                 const url = `${breedsUrl}?health_issues=${healthIssue}`;
@@ -106,7 +106,7 @@ label {
             }
         }
 
-        async function showWeights() {
+        async function Show_Weights() {
             try {
                 const unit = document.querySelector('input[name="weightUnit"]:checked').value;
                 const data = await fetchData(breedsUrl);
@@ -116,7 +116,7 @@ label {
             }
         }
 
-        async function showIntelligenceFriendly() {
+        async function Show_IntelligenceFriendly() {
             try {
                 const data = await fetchData(breedsUrl);
                 if (data) displayResult(data.map(cat => `${cat.name}: I - ${cat.intelligence}, F - ${cat.child_friendly}`).join('<br>'));
@@ -131,7 +131,7 @@ label {
             return totalIntelligence / (filteredCats.length || 1); // Prevent division by zero
         }
 
-        async function showAverageIntelligence() {
+        async function Show_AverageIntelligence() {
             try {
                 const data = await fetchData(breedsUrl);
                 if (data) {
@@ -143,7 +143,7 @@ label {
             }
         }
 
-        async function showAverageIntelligenceChildFriendly() {
+        async function Show_AverageIntelligenc_eChildFriendly() {
             try {
                 const data = await fetchData(breedsUrl);
                 if (data) {
