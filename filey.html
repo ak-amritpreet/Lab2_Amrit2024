@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cat Selector App</title>
+    <style>
+        button, input, select {
+    margin: 8px 0;
+    padding: 10px;
+    cursor: pointer;
+    background-color: #6a5acd;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+    transition: background-color 0.3s ease-in-out;
+}
+
+button:hover, input:hover, select:hover {
+    background-color: #4b0082;
+}
+
+label {
+    display: block;
+    margin: 8px 0;
+    border-width: 3;
+}
+
+#result {
+    margin-top: 15px;
+    padding: 10px;
+    background-color: #dcdcdc;
+    border-radius: 6px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        margin: 20px;
+        background-color: #f8f8f8;
+        color: #555;
+    }
+
+    h2 {
+    color: #0e68ce;
+     }
+
+}
+
+    </style>
+</head>
+<body>
+    <h2>CAT SELECTOR APPLICATION</h2>
+
+    <button onclick="showAllNames()">All Names</button>
+
+    <label for="healthInput">Health Issues:</label>
+    <input type="number" id="healthInput">
+
+    <button onclick="showWeights()">Weight</button>
+    <label for="weightUnitImperial">Imperial</label>
+    <input type="radio" id="weightUnitImperial" name="weightUnit" value="imperial" checked>
+    <label for="weightUnitMetric">Metric</label>
+    <input type="radio" id="weightUnitMetric" name="weightUnit" value="metric">
+
+    <button onclick="showIntelligenceFriendly()">Intelligence - Friendly</button>
+    <button onclick="showAverageIntelligence()">Average Intelligence</button>
+    <button onclick="showAverageIntelligenceChildFriendly()">Average Intelligence for Child Friendly</button>
+
+    <div id="result"></div>
+
+    <script>
+        const breedsUrl = 'https://api.thecatapi.com/v1/breeds';
+
+        async function fetchData(url) {
+            try {
+                const response = await fetch(url);
+                if (!response.ok) throw new Error(`Failed to fetch data: ${response.status} ${response.statusText}`);
+                return await response.json();
+            } catch (error) {
+                console.error('Error in fetchData:', error.message);
+                return null;
+            }
+        }
+
+        async function showAllNames() {
+            try {
+                const data = await fetchData(breedsUrl);
+                if (data) displayResult(data.map(cat => cat.name).join(', '));
+            } catch (error) {
+                console.error('Error in showAllNames:', error.message);
+            }
+        }
+
+        async function showCatsByHealth() {
+            try {
+                const healthIssue = document.getElementById('healthInput').value;
+                const url = `${breedsUrl}?health_issues=${healthIssue}`;
+                const data = await fetchData(url);
+                if (data) displayResult(data.map(cat => cat.name).join(', '));
+            } catch (error) {
+                console.error('Error in showCatsByHealth:', error.message);
+            }
+        }
+
+        async function showWeights() {
+            try {
+                const unit = document.querySelector('input[name="weightUnit"]:checked').value;
+                const data = await fetchData(breedsUrl);
+                if (data) displayResult(data.map(cat => `${cat.name}: ${cat.weight[unit]} ${unit.toUpperCase()}`).join('<br>'));
+            } catch (error) {
+                console.error('Error in showWeights:', error);
+            }
+        }
+
+        async function showIntelligenceFriendly() {
+            try {
+                const data = await fetchData(breedsUrl);
+                if (data) displayResult(data.map(cat => `${cat.name}: I - ${cat.intelligence}, F - ${cat.child_friendly}`).join('<br>'));
+            } catch (error) {
+                console.error('Error in showIntelligenceFriendly:', error);
+            }
+        }
+
+        async function calculateAverageIntelligence(data, filterFunction = () => true) {
+            const filteredCats = data.filter(filterFunction);
+            const totalIntelligence = filteredCats.reduce((sum, cat) => sum + cat.intelligence, 0);
+            return totalIntelligence / (filteredCats.length || 1); // Prevent division by zero
+        }
+
+        async function showAverageIntelligence() {
+            try {
+                const data = await fetchData(breedsUrl);
+                if (data) {
+                    const averageIntelligence = await calculateAverageIntelligence(data);
+                    displayResult(`Average Intelligence: ${averageIntelligence.toFixed(2)}`);
+                }
+            } catch (error) {
+                console.error('Error in showAverageIntelligence:', error);
+            }
+        }
+
+        async function showAverageIntelligenceChildFriendly() {
+            try {
+                const data = await fetchData(breedsUrl);
+                if (data) {
+                    const averageIntelligence = await calculateAverageIntelligence(data, cat => cat.child_friendly > 3);
+                    displayResult(`Average Intelligence for Child Friendly: ${averageIntelligence.toFixed(2)}`);
+                }
+            } catch (error) {
+                console.error('Error in showAverageIntelligenceChildFriendly:', error);
+            }
+        }
+
+        const displayResult = (result) => {
+            const resultElement = document.getElementById('result');
+            if (resultElement) {
+                resultElement.innerHTML = result;
+            } else {
+                console.error('Error in displayResult: Result element not found.');
+            }
+        };
+    </script>
+</body>
+</html>
